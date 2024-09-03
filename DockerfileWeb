@@ -1,0 +1,21 @@
+# Usa la imagen base de Alpine
+FROM alpine:latest
+
+# Instala Nginx
+RUN apk add --no-cache nginx
+
+# Copia los archivos de configuración de Nginx
+COPY config/nginx/nginx.conf /etc/nginx/nginx.conf
+COPY config/nginx/default.conf /etc/nginx/conf.d/default.conf
+
+# Crea un directorio para la aplicación
+RUN mkdir -p /app/public
+
+# Copia los archivos de la aplicación al contenedor
+COPY ./ /app/
+
+# Expone el puerto 80
+EXPOSE 80
+
+# Comando para iniciar Nginx
+CMD ["nginx", "-g", "daemon off;"]

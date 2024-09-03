@@ -1,0 +1,18 @@
+services:
+    web:
+        build:
+            context: .
+            dockerfile: DockerfileWeb
+        ports:
+            - "80:80"
+        # volumes:
+        # - ./src:/app/public
+    php:
+        build:
+            context: .
+            dockerfile: DockerfileApp
+        volumes:
+            - ./:/app/
+volumes:
+    mysqldata: {}
+
