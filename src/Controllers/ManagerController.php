@@ -22,7 +22,6 @@ class ManagerController extends RequestController
     {
         $titulo = "Bienvenido a mi sitio";
         $contenido = "Este es el contenido de la página.";
-        dd($name);
         $a = $this->renderView(__ROOT__ . "/src/Templates/IndexView.php", [
             'titulo' => $titulo,
             'contenido' => $contenido

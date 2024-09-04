@@ -16,6 +16,8 @@ class Router
             $found = self::manageController($currentNamespace, $request);
             if ($found) break;
         }
+
+        if (!$found) throw new \Exception("Uri not found");
     }
 
     private static function getControllerFiles()
