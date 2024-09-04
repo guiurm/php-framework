@@ -46,10 +46,15 @@ class DependencyInjectorMethodParameter
     }
     public function allowsNull()
     {
-        $this->_reflectionParameter->allowsNull();
+        return $this->_reflectionParameter->allowsNull();
     }
     public function isOptional()
     {
-        $this->_reflectionParameter->isOptional();
+        return $this->_reflectionParameter->isOptional();
+    }
+
+    public function getArgPosition()
+    {
+        return $this->_reflectionParameter->getPosition();
     }
 }

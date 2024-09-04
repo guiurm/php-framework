@@ -5,16 +5,24 @@ namespace src\Controllers;
 use framework\Attributes\Route;
 use src\Models\User;
 
-#[Route(alias: "manager", path: "/manager", method: "GET")]
 class ManagerController
 {
 
     #[Route(alias: "manager.index", path: "/", method: "GET")]
-    public function index(User $manager, string $name) {}
+    public function index()
+    {
+        echo "loaded";
+    }
 
-    #[Route(alias: "manager.index", path: "/login", method: "GET")]
-    public function login(string $name) {}
+    #[Route(alias: "manager.login", path: "/login", method: "GET")]
+    public function login(string $name)
+    {
+        echo "manager.login";
+    }
 
-    #[Route(alias: "manager.index", path: "/register", method: ["GET", "POST"])]
-    public function register(string $name) {}
+    #[Route(alias: "manager.register", path: "/register", method: ["GET", "POST"])]
+    public function register(string $name)
+    {
+        echo "manager.register";
+    }
 }

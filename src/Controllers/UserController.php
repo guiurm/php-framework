@@ -10,11 +10,20 @@ class UserController
 {
 
     #[Route(alias: "user.index", path: "/", method: "GET")]
-    public function index(User $user, string $name) {}
+    public function index(User $user, string $name, array $a)
+    {
+        echo "user.index";
+    }
 
-    #[Route(alias: "user.index", path: "/login", method: "GET")]
-    public function login(string $name) {}
+    #[Route(alias: "user.login", path: "/login", method: "GET")]
+    public function login(string $name)
+    {
+        echo "user.login";
+    }
 
-    #[Route(alias: "user.index", path: "/register", method: ["GET", "POST"])]
-    public function register(string $name) {}
+    #[Route(alias: "user.register", path: "/register", method: ["GET", "POST"])]
+    public function register(string $name)
+    {
+        echo "user.register";
+    }
 }

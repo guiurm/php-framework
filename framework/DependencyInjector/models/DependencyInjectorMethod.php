@@ -78,4 +78,9 @@ class DependencyInjectorMethod
     {
         return $this->attributes;
     }
+
+    public function reflection()
+    {
+        return $this->_reflectionMethod;
+    }
 }

@@ -2,8 +2,8 @@
 
 namespace Framework\DependencyInjector;
 
-use DependencyInjectorAttribute;
-use DependencyInjectorMethod;
+use Framework\DependencyInjector\Models\DependencyInjectorAttribute;
+use Framework\DependencyInjector\Models\DependencyInjectorMethod;
 use Framework\DependencyInjector\Services\DependencyInjectorService;
 use ReflectionClass;
 use ReflectionMethod;
@@ -18,7 +18,7 @@ class DependencyInjectorClass
     private $_methods = [];
     /**
      * Summary of _attributes
-     * @var array<string,DependencyInjectorAttribute>
+     * @var array<string, DependencyInjectorAttribute>
      */
     private $_attributes = [];
 
@@ -56,5 +56,10 @@ class DependencyInjectorClass
     public function getMethods()
     {
         return $this->_methods;
+    }
+
+    public function getInstance(...$args)
+    {
+        return $this->_reflection->newInstance(...$args);
     }
 }

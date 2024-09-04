@@ -2,52 +2,65 @@
 
 namespace Framework\Http;
 
-use Exception;
 use framework\Attributes\Route;
 use Framework\DependencyInjector\DependencyInjectorClass;
-use ReflectionClass;
-use src\Controllers\UserController;
-
-use function Src\Kernel\dd;
-
-function obtenerNamespaceDesdeArchivo($rutaArchivo)
-{
-    // Verifica si el archivo existe
-    if (!file_exists($rutaArchivo)) {
-        throw new Exception("El archivo no existe: " . $rutaArchivo);
-    }
-
-    // Obtiene el contenido del archivo
-    $content = file_get_contents($rutaArchivo);
-    $namespacePosition = strpos($content, 'namespace ');
-    $namespaceLength = strlen('namespace ');
-    $tailingComaPosition = strpos($content, ';');
-    $namspace = substr($content, $namespacePosition + $namespaceLength, $tailingComaPosition - $namespacePosition - $namespaceLength);
-
-    $classPosition = strpos($content, 'class ');
-    $classpaceLength = strlen('class ');
-    $braComaPosition = strpos($content, '{');
-
-    $c = substr($content, $classPosition + $classpaceLength, $braComaPosition - $classPosition - $classpaceLength);
-
-    return trim($namspace . '\\' . $c);
-}
+use Framework\DependencyInjector\Models\DependencyInjectorMethod;
+use Framework\DependencyInjector\Services\DependencyInjectorService;
 
 class Router
 {
     public static function manageRequest(Request $request)
     {
-        //dd($request);
-        //echo $request->getUri();
-
-
-        foreach (glob(__ROOT__ . "src/Controllers/*.php") as $filename) {
-            $namespace = obtenerNamespaceDesdeArchivo($filename);
-            $id = new DependencyInjectorClass($namespace);
-            dd($id->getClassAttributes()[Route::class]->getArguments()['path']);
+        $found = false;
+        foreach (self::getControllerFiles() as $currentNamespace) {
+            $found = self::manageController($currentNamespace, $request);
+            if ($found) break;
         }
     }
+
+    private static function getControllerFiles()
+    {
+        /**
+         * @var string[]
+         */
+        $namespaces = [];
+        foreach (glob(__ROOT__ . "src/Controllers/*.php") as $filename) {
+            $namespaces[] = DependencyInjectorService::getNamespaceFromFile($filename);
+        }
+        return $namespaces;
+    }
+
+    private static function manageController(string $namespace, Request $request)
+    {
+        $found = false;
+        $id = new DependencyInjectorClass($namespace);
+        $classRoute = isset($id->getClassAttributes()[Route::class]) ? $id->getClassAttributes()[Route::class] : null;
+        $baseUrl = "";
+
+        if (null !== $classRoute) $baseUrl = $classRoute->getArguments()['path'];
+
+        foreach ($id->getMethods() as $method) {
+            if ($found) break;
+            if (self::manageControllerMethod($method, $baseUrl, $request->getUri())) {
+                $found = true;
+                $args = DependencyInjectorService::gerArgs($method->getArguments());
+                $method->reflection()->invoke($id->getInstance(), ...$args);
+            }
+        }
+
+        return $found;
+    }
+
+    private static function manageControllerMethod(DependencyInjectorMethod $method, string $baseUrl, string $uri)
+    {
+
+        $currentMethodRouteAttribute = isset($method->getAttributes()[Route::class]) ? $method->getAttributes()[Route::class] : null;
+        if (null === $currentMethodRouteAttribute) return false;
+        $currentPath = rtrim($currentMethodRouteAttribute->getArguments()['path'], '/');
+        if ($uri === $baseUrl . $currentPath || $uri === $baseUrl . $currentPath . '/') {
+            return true;
+        }
+
+        return false;
+    }
 }
-
-
-// Ejemplo de uso

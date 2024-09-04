@@ -4,9 +4,8 @@ namespace src\Models;
 
 class User
 {
-   public function __construct(
-      private string $_name
-   ) {}
+   private string $_name;
+   public function __construct() {}
 
    public function getName(): string
    {
