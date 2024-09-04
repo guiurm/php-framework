@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 namespace Framework\Http;
 
-class Request 
+class Request
 {
     public function __construct(
         private readonly array $_getParams,
@@ -11,11 +11,15 @@ class Request
         private readonly array $_files,
         // private readonly array $_headers,
         private readonly array $_server,
-    ) {
-    }
+    ) {}
 
     public static function createFromGlobals(): static
     {
-        return new static($_GET,$_POST,$_COOKIE,$_FILES,$_SERVER);
+        return new static($_GET, $_POST, $_COOKIE, $_FILES, $_SERVER);
+    }
+
+    public function getUri()
+    {
+        return $this->_server["REQUEST_URI"];
     }
 }
