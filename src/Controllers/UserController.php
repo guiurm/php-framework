@@ -3,10 +3,11 @@
 namespace src\Controllers;
 
 use framework\Attributes\Route;
+use Framework\Http\RequestController;
 use src\Models\User;
 
 #[Route(alias: "user", path: "/user", method: "GET")]
-class UserController
+class UserController extends RequestController
 {
 
     #[Route(alias: "user.index", path: "/", method: "GET")]

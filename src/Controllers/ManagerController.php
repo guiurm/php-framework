@@ -3,9 +3,12 @@
 namespace src\Controllers;
 
 use framework\Attributes\Route;
+use Framework\Http\RequestController;
 use src\Models\User;
 
-class ManagerController
+use function Src\Kernel\dd;
+
+class ManagerController extends RequestController
 {
 
     #[Route(alias: "manager.index", path: "/", method: "GET")]
@@ -15,9 +18,17 @@ class ManagerController
     }
 
     #[Route(alias: "manager.login", path: "/login", method: "GET")]
-    public function login(string $name)
+    public function login(User $name)
     {
-        echo "manager.login";
+        $titulo = "Bienvenido a mi sitio";
+        $contenido = "Este es el contenido de la página.";
+        dd($name);
+        $a = $this->renderView(__ROOT__ . "/src/Templates/IndexView.php", [
+            'titulo' => $titulo,
+            'contenido' => $contenido
+        ]);
+
+        echo $a;
     }
 
     #[Route(alias: "manager.register", path: "/register", method: ["GET", "POST"])]

@@ -9,7 +9,6 @@ class Request
         private readonly array $_postParams,
         private readonly array $_cookies,
         private readonly array $_files,
-        // private readonly array $_headers,
         private readonly array $_server,
     ) {}
 

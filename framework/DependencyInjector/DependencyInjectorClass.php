@@ -8,6 +8,8 @@ use Framework\DependencyInjector\Services\DependencyInjectorService;
 use ReflectionClass;
 use ReflectionMethod;
 
+use function Src\Kernel\dd;
+
 class DependencyInjectorClass
 {
     private ReflectionClass $_reflection;
@@ -26,7 +28,6 @@ class DependencyInjectorClass
         string $class,
     ) {
         $this->_reflection = new ReflectionClass($class);
-        //$this->_attributes = DependencyInjectorService::getClassAttributes($this->_reflection);
         $this->setClassAttributes();
         $this->setMethods();
     }
@@ -39,6 +40,7 @@ class DependencyInjectorClass
     private function setMethods(): void
     {
         $reflectionMethods = $this->_reflection->getMethods();
+
         foreach ($reflectionMethods as $reflectionMethod) {
             $this->_methods[] = DependencyInjectorService::getMethod($reflectionMethod);
         }
@@ -61,5 +63,10 @@ class DependencyInjectorClass
     public function getInstance(...$args)
     {
         return $this->_reflection->newInstance(...$args);
+    }
+
+    public function getReflection()
+    {
+        return $this->_reflection;
     }
 }

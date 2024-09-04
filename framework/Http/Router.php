@@ -32,8 +32,14 @@ class Router
 
     private static function manageController(string $namespace, Request $request)
     {
+
         $found = false;
         $id = new DependencyInjectorClass($namespace);
+
+
+        if (!$id->getReflection()->isSubclassOf(RequestController::class)) return $found;
+
+
         $classRoute = isset($id->getClassAttributes()[Route::class]) ? $id->getClassAttributes()[Route::class] : null;
         $baseUrl = "";
 
@@ -41,9 +47,11 @@ class Router
 
         foreach ($id->getMethods() as $method) {
             if ($found) break;
+
             if (self::manageControllerMethod($method, $baseUrl, $request->getUri())) {
                 $found = true;
                 $args = DependencyInjectorService::gerArgs($method->getArguments());
+
                 $method->reflection()->invoke($id->getInstance(), ...$args);
             }
         }

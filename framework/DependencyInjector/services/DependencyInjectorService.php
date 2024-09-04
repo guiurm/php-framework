@@ -10,6 +10,8 @@ use Framework\DependencyInjector\Models\DependencyInjectorMethodParameter;
 use ReflectionClass;
 use ReflectionMethod;
 
+use function Src\Kernel\dd;
+
 class DependencyInjectorService
 {
 
@@ -57,8 +59,11 @@ class DependencyInjectorService
          * @var DependencyInjectorMethodParameter[]
          */
         $arguments = [];
+
         foreach ($reflectionParameters as $parameter) {
+
             $arg = new DependencyInjectorMethodParameter($parameter);
+
             $arg->setName($parameter->getName())
                 ->setIsObject($parameter->getType()->isBuiltin() ? false : true)
                 ->setType($arg->getIsObject() ? $parameter->getType()->getName() : $parameter->getType());
@@ -74,6 +79,7 @@ class DependencyInjectorService
     public static function getMethod(ReflectionMethod $reflectionMethod)
     {
         $method = new DependencyInjectorMethod($reflectionMethod);
+
         $method->setName($reflectionMethod->getName());
 
         $method->setArguments(DependencyInjectorService::getMethodArguments($reflectionMethod));
