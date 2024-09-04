@@ -7,6 +7,8 @@ use Framework\DependencyInjector\DependencyInjectorClass;
 use Framework\DependencyInjector\Models\DependencyInjectorMethod;
 use Framework\DependencyInjector\Services\DependencyInjectorService;
 
+use function Src\Kernel\dd;
+
 class Router
 {
     public static function manageRequest(Request $request)
@@ -17,7 +19,10 @@ class Router
             if ($found) break;
         }
 
-        if (!$found) throw new \Exception("Uri not found");
+        if (!$found) {
+            //throw new \Exception("Uri not found");
+            dd($request->getUri() . ' not found');
+        }
     }
 
     private static function getControllerFiles()
