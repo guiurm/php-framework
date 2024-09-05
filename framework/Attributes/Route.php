@@ -7,12 +7,19 @@ use Attribute;
 #[Attribute]
 class Route
 {
+    public string $alias;
+    public string $path;
+    public array $methods;
 
     public function __construct(
-        public ?string $alias = "",
-        public ?string $path = null,
-        public string | array $method,
-    ) {}
+        string $alias = "",
+        string $path = "",
+        string |array $method = "GET",
+    ) {
+        $this->alias = $alias;
+        $this->path = $path;
+        $this->methods = is_array($method) ? $method : [$method];
+    }
 
     public function checkRoute(string $route): void {}
 }

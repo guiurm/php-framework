@@ -8,6 +8,7 @@ class DependencyInjectorMethodParameter
 {
     private string $_name;
     private string $_type;
+    private bool $hasMultipleTypes;
     private bool $_isObject;
     private ReflectionParameter $_reflectionParameter;
 
@@ -56,5 +57,16 @@ class DependencyInjectorMethodParameter
     public function getArgPosition()
     {
         return $this->_reflectionParameter->getPosition();
+    }
+
+    public function setHasMultipleTypes(bool $state)
+    {
+        $this->hasMultipleTypes = $state;
+        return $this->_reflectionParameter->isOptional();
+    }
+
+    public function getHasMultipleTypes()
+    {
+        return $this->hasMultipleTypes;
     }
 }

@@ -6,7 +6,7 @@ use framework\Attributes\Route;
 use Framework\Http\RequestController;
 use src\Models\User;
 
-#[Route(alias: "user", path: "/user", method: "GET")]
+#[Route("user",  "/user",  "GET")]
 class UserController extends RequestController
 {
 

@@ -7,6 +7,7 @@ use Framework\DependencyInjector\DependencyInjectorClass;
 use Framework\DependencyInjector\Models\DependencyInjectorAttribute;
 use Framework\DependencyInjector\Models\DependencyInjectorMethod;
 use Framework\DependencyInjector\Models\DependencyInjectorMethodParameter;
+use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionMethod;
 
@@ -22,6 +23,9 @@ class DependencyInjectorService
      */
     public static function getClassAttributes(ReflectionClass $reflectionClass)
     {
+        /**
+         * @var ReflectionAttribute[]
+         */
         $classAttributes = $reflectionClass->getAttributes();
 
         /**
@@ -32,7 +36,7 @@ class DependencyInjectorService
         foreach ($classAttributes as $attribute) {
 
             $att = new DependencyInjectorAttribute();
-            $att->setName($attribute->getName())->setArguments($attribute->getArguments());
+            $att->setName($attribute->getName())->setArguments($attribute->getArguments())->setReflection($attribute);
 
             $attributes[$att->getName()] = $att;
         }
@@ -46,7 +50,7 @@ class DependencyInjectorService
         $attributes = [];
         foreach ($classAttributes as $attribute) {
             $att = new DependencyInjectorAttribute();
-            $att->setName($attribute->getName())->setArguments($attribute->getArguments());
+            $att->setName($attribute->getName())->setArguments($attribute->getArguments())->setReflection($attribute);
             $attributes[$att->getName()] = $att;
         }
         return $attributes;
@@ -64,8 +68,11 @@ class DependencyInjectorService
 
             $arg = new DependencyInjectorMethodParameter($parameter);
 
+            $multipleTypes = strpos((string)$parameter->getType(), "|") ? true : false;
+            $arg->setHasMultipleTypes($multipleTypes);
+
             $arg->setName($parameter->getName())
-                ->setIsObject($parameter->getType()->isBuiltin() ? false : true)
+                ->setIsObject($arg->getHasMultipleTypes() ? false : ($parameter->getType()->isBuiltin() ? false : true))
                 ->setType($arg->getIsObject() ? $parameter->getType()->getName() : $parameter->getType());
 
             $parameter->allowsNull();

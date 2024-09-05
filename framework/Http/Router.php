@@ -4,8 +4,10 @@ namespace Framework\Http;
 
 use framework\Attributes\Route;
 use Framework\DependencyInjector\DependencyInjectorClass;
+use Framework\DependencyInjector\Models\DependencyInjectorAttribute;
 use Framework\DependencyInjector\Models\DependencyInjectorMethod;
 use Framework\DependencyInjector\Services\DependencyInjectorService;
+use ReflectionClass;
 
 use function Src\Kernel\dd;
 
@@ -50,7 +52,10 @@ class Router
         $classRoute = isset($id->getClassAttributes()[Route::class]) ? $id->getClassAttributes()[Route::class] : null;
         $baseUrl = "";
 
-        if (null !== $classRoute) $baseUrl = $classRoute->getArguments()['path'];
+        if (null !== $classRoute) {
+            $route = self::parseRouteAttribute($classRoute);
+            $baseUrl = $route->path;
+        }
 
         foreach ($id->getMethods() as $method) {
             if ($found) break;
@@ -64,6 +69,33 @@ class Router
         }
 
         return $found;
+    }
+
+
+    private static function parseRouteAttribute(DependencyInjectorAttribute $attribute): Route
+    {
+        $id = new DependencyInjectorClass($attribute->getReflection()->getName());
+        $r = new ReflectionClass($attribute->getName());
+
+        return null === $r->getConstructor() ? $ins = self::noCons($id) : $ins = self::cons($r, $attribute);
+    }
+
+    private static function noCons(DependencyInjectorClass $id)
+    {
+        return $id->getReflection()->newInstance();
+    }
+
+    private static function cons(ReflectionClass $r, DependencyInjectorAttribute $attribute): object
+    {
+        $parameters = $r->getConstructor()->getParameters();
+        $arguments = $attribute->getArguments();
+        $args = [];
+        foreach ($parameters as $parameter) {
+            $value = $arguments[$parameter->getName()] ?? $arguments[$parameter->getPosition()] ?? null;
+            $args[$parameter->getPosition()] = $value;
+        }
+        dd($args);
+        return $r->newInstanceArgs($args);
     }
 
     private static function manageControllerMethod(DependencyInjectorMethod $method, string $baseUrl, string $uri)

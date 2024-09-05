@@ -4,15 +4,14 @@ namespace Framework\DependencyInjector\Models;
 
 class DependencyInjectorAttribute
 {
-    /**
-     * @var string
-     */
-    private $name = '';
+    private string $name = '';
+
+    private \ReflectionAttribute $reflection;
 
     /**
      * @var array<string, string>
      */
-    private $arguments = [];
+    private array $arguments = [];
     public function __construct() {}
 
     public function getName()
@@ -40,5 +39,16 @@ class DependencyInjectorAttribute
     public function getArguments()
     {
         return $this->arguments;
+    }
+
+    public function setReflection(\ReflectionAttribute $reflection): DependencyInjectorAttribute
+    {
+        $this->reflection = $reflection;
+        return $this;
+    }
+
+    public function getReflection(): \ReflectionAttribute
+    {
+        return $this->reflection;
     }
 }
