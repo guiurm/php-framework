@@ -24,7 +24,7 @@ $u->setEmail('jmail@mail.test');
 
 
 $res = (new Serializer())->serialize($u, JSONConverter::getType());
-//echo $res;
+dd($res);
 
 
 //dd(json_decode($res));
