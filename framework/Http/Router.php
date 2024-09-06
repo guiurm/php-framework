@@ -43,28 +43,25 @@ class Router
     {
 
         $found = false;
-        $id = new DependencyInjectorClass($namespace);
+        $dependencyInjectionClass = new DependencyInjectorClass($namespace);
 
+        if (!$dependencyInjectionClass->getReflection()->isSubclassOf(RequestController::class)) return $found;
 
-        if (!$id->getReflection()->isSubclassOf(RequestController::class)) return $found;
-
-
-        $classRoute = isset($id->getClassAttributes()[Route::class]) ? $id->getClassAttributes()[Route::class] : null;
         $baseUrl = "";
 
-        if (null !== $classRoute) {
-            $route = self::parseRouteAttribute($classRoute);
+        if (array_key_exists(Route::class, $dependencyInjectionClass->getClassAttributes())) {
+            $route = self::parseRouteAttribute($dependencyInjectionClass->getClassAttributes()[Route::class]);
             $baseUrl = $route->path;
         }
 
-        foreach ($id->getMethods() as $method) {
+        foreach ($dependencyInjectionClass->getMethods() as $method) {
             if ($found) break;
 
-            if (self::manageControllerMethod($method, $baseUrl, $request->getUri())) {
-                $found = true;
-                $args = DependencyInjectorService::gerArgs($method->getArguments());
+            if ($found = self::validControllerMethod($method, $baseUrl, $request)) {
 
-                $method->reflection()->invoke($id->getInstance(), ...$args);
+                $args = DependencyInjectorService::instanceNewMethodParameter($method->getArguments());
+
+                $method->reflection()->invoke($dependencyInjectionClass->getInstance(), ...$args);
             }
         }
 
@@ -74,40 +71,16 @@ class Router
 
     private static function parseRouteAttribute(DependencyInjectorAttribute $attribute): Route
     {
-        $id = new DependencyInjectorClass($attribute->getReflection()->getName());
-        $r = new ReflectionClass($attribute->getName());
-
-        return null === $r->getConstructor() ? $ins = self::noCons($id) : $ins = self::cons($r, $attribute);
+        return DependencyInjectorService::getInstanceFromAttribute($attribute);
     }
 
-    private static function noCons(DependencyInjectorClass $id)
+    private static function validControllerMethod(DependencyInjectorMethod $method, string $baseUrl, Request $request)
     {
-        return $id->getReflection()->newInstance();
-    }
+        if (!array_key_exists(Route::class, $method->getAttributes()))
+            return false;
 
-    private static function cons(ReflectionClass $r, DependencyInjectorAttribute $attribute): object
-    {
-        $parameters = $r->getConstructor()->getParameters();
-        $arguments = $attribute->getArguments();
-        $args = [];
-        foreach ($parameters as $parameter) {
-            $value = $arguments[$parameter->getName()] ?? $arguments[$parameter->getPosition()] ?? null;
-            $args[$parameter->getPosition()] = $value;
-        }
-        dd($args);
-        return $r->newInstanceArgs($args);
-    }
+        $route = self::parseRouteAttribute($method->getAttributes()[Route::class]);
 
-    private static function manageControllerMethod(DependencyInjectorMethod $method, string $baseUrl, string $uri)
-    {
-
-        $currentMethodRouteAttribute = isset($method->getAttributes()[Route::class]) ? $method->getAttributes()[Route::class] : null;
-        if (null === $currentMethodRouteAttribute) return false;
-        $currentPath = rtrim($currentMethodRouteAttribute->getArguments()['path'], '/');
-        if ($uri === $baseUrl . $currentPath || $uri === $baseUrl . $currentPath . '/') {
-            return true;
-        }
-
-        return false;
+        return $request->validateRequest($route, $baseUrl);
     }
 }

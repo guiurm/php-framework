@@ -2,6 +2,8 @@
 
 namespace Framework\Http;
 
+use framework\Attributes\Route;
+
 class Request
 {
     public function __construct(
@@ -38,5 +40,13 @@ class Request
     public function getMethod()
     {
         return $this->_server["REQUEST_METHOD"];
+    }
+
+    public function validateRequest(Route $route, $baseUrl = "")
+    {
+        $currentPath = rtrim($route->path, '/');
+
+        if (($this->getUri() === "$baseUrl$currentPath" || $this->getUri() === "$baseUrl$currentPath/") && in_array($this->getMethod(), $route->methods))
+            return true;
     }
 }

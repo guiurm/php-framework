@@ -100,7 +100,7 @@ class DependencyInjectorService
      * @param DependencyInjectorMethodParameter[] $dependencyInjectorMethodParameter
      * @return (null|object|string|int|array|false)[]
      */
-    public static function gerArgs(
+    public static function instanceNewMethodParameter(
         array $dependencyInjectorMethodParameter
     ) {
 
@@ -112,11 +112,11 @@ class DependencyInjectorService
                 continue;
             }
 
-            $args[$currentMethodArg->getArgPosition()] = self::genVal($currentMethodArg);
+            $args[$currentMethodArg->getArgPosition()] = self::instanceNewParameterValue($currentMethodArg);
         }
         return $args;
     }
-    public static function genVal(DependencyInjectorMethodParameter $methodArg)
+    public static function instanceNewParameterValue(DependencyInjectorMethodParameter $methodArg)
     {
         if ($methodArg->getIsObject()) {
             $id = new DependencyInjectorClass($methodArg->getType());
@@ -166,5 +166,43 @@ class DependencyInjectorService
         }
 
         throw new Exception("Namespace or class not mached in file: $rutaArchivo");
+    }
+
+    public static function getInstanceFromAttribute(DependencyInjectorAttribute $attribute)
+    {
+        $args = self::parseAttributeArguments($attribute);
+        $reflection = new ReflectionClass($attribute->getName());
+        return $reflection->newInstanceArgs($args);
+    }
+
+    /**
+     * Return attribute arguments in an array with ordered by constructor or by associative array
+     * @param \Framework\DependencyInjector\Models\DependencyInjectorAttribute $attribute
+     * @param bool $associative
+     * @return array<string, string|null>
+     */
+    public static function parseAttributeArguments(DependencyInjectorAttribute $attribute, bool $associative = false)
+    {
+        /**
+         * @var array<string, string|null>
+         */
+        $args = [];
+
+        $constructor = (new ReflectionClass($attribute->getName()))->getConstructor();
+        if (null === $constructor) return $args;
+
+        $parameters = $constructor->getParameters();
+        $arguments = $attribute->getArguments();
+
+        foreach ($parameters as $parameter) {
+            $value = $arguments[$parameter->getName()] ?? $arguments[$parameter->getPosition()] ?? null;
+
+            if ($associative)
+                $args[$parameter->getName()] = $value;
+            else
+                $args[$parameter->getPosition()] = $value;
+        }
+
+        return $args;
     }
 }
