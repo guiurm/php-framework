@@ -7,7 +7,6 @@ use Framework\DependencyInjector\DependencyInjectorClass;
 use Framework\DependencyInjector\Models\DependencyInjectorAttribute;
 use Framework\DependencyInjector\Models\DependencyInjectorMethod;
 use Framework\DependencyInjector\Services\DependencyInjectorService;
-use ReflectionClass;
 
 use function Src\Kernel\dd;
 
@@ -15,16 +14,18 @@ class Router
 {
     public static function manageRequest(Request $request)
     {
-        $found = false;
+        $response = (new Response())
+            ->setResponseCode(HTTPResponseCode::NOT_FOUND)
+            ->setContent(HTTPResponseCode::MESSAGE_HTTP[HTTPResponseCode::NOT_FOUND]);
+
         foreach (self::getControllerFiles() as $currentNamespace) {
-            $found = self::manageController($currentNamespace, $request);
-            if ($found) break;
+            if ($currentResponse = self::manageController($currentNamespace, $request)) {
+                $response = $currentResponse;
+            }
         }
 
-        if (!$found) {
-            //throw new \Exception("Uri not found");
-            dd($request->getUri() . ' not found');
-        }
+        echo $response->getContent();
+        die();
     }
 
     private static function getControllerFiles()
@@ -41,11 +42,9 @@ class Router
 
     private static function manageController(string $namespace, Request $request)
     {
-
-        $found = false;
         $dependencyInjectionClass = new DependencyInjectorClass($namespace);
 
-        if (!$dependencyInjectionClass->getReflection()->isSubclassOf(RequestController::class)) return $found;
+        if (!$dependencyInjectionClass->getReflection()->isSubclassOf(RequestController::class)) return;
 
         $baseUrl = "";
 
@@ -55,17 +54,22 @@ class Router
         }
 
         foreach ($dependencyInjectionClass->getMethods() as $method) {
-            if ($found) break;
-
-            if ($found = self::validControllerMethod($method, $baseUrl, $request)) {
-
-                $args = DependencyInjectorService::instanceNewMethodParameter($method->getArguments());
-
-                $method->reflection()->invoke($dependencyInjectionClass->getInstance(), ...$args);
+            if (self::validControllerMethod($method, $baseUrl, $request)) {
+                return self::manageControllerMethod($dependencyInjectionClass, $method);
             }
         }
+    }
 
-        return $found;
+    private static function manageControllerMethod(DependencyInjectorClass $dependencyInjectionClass, DependencyInjectorMethod $method)
+    {
+        $args = DependencyInjectorService::instanceNewMethodParameter($method->getArguments());
+        /**
+         * @var Response
+         */
+        $response = $method->reflection()->invoke($dependencyInjectionClass->getInstance(), ...$args);
+        if (!($response instanceof Response)) throw new \ErrorException("The return type is not expected");
+
+        return $response;
     }
 
 
@@ -80,7 +84,7 @@ class Router
             return false;
 
         $route = self::parseRouteAttribute($method->getAttributes()[Route::class]);
-
-        return $request->validateRequest($route, $baseUrl);
+        $route->path = "$baseUrl$route->path";
+        return $request->validateRequest($route);
     }
 }

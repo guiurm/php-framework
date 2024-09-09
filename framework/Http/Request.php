@@ -42,11 +42,11 @@ class Request
         return $this->_server["REQUEST_METHOD"];
     }
 
-    public function validateRequest(Route $route, $baseUrl = "")
+    public function validateRequest(Route $route)
     {
         $currentPath = rtrim($route->path, '/');
 
-        if (($this->getUri() === "$baseUrl$currentPath" || $this->getUri() === "$baseUrl$currentPath/") && in_array($this->getMethod(), $route->methods))
+        if (($this->getUri() === $currentPath || $this->getUri() === "$currentPath/") && in_array($this->getMethod(), $route->methods))
             return true;
     }
 }

@@ -6,7 +6,6 @@ use framework\Attributes\Route;
 use Framework\Http\RequestController;
 use src\Models\User;
 
-use function Src\Kernel\dd;
 
 class ManagerController extends RequestController
 {
@@ -22,12 +21,17 @@ class ManagerController extends RequestController
     {
         $titulo = "Bienvenido a mi sitio";
         $contenido = "Este es el contenido de la página.";
-        $a = $this->renderView(__ROOT__ . "/src/Templates/IndexView.php", [
+        /*$a = $this->renderView(__ROOT__ . "/src/Templates/IndexView.php", [
             'titulo' => $titulo,
             'contenido' => $contenido
         ]);
 
-        echo $a;
+        echo $a;*/
+
+        return $this->render(__ROOT__ . "/src/Templates/IndexView.php", [
+            'titulo' => $titulo,
+            'contenido' => $contenido
+        ]);
     }
 
     #[Route(alias: "manager.register", path: "/register", method: ["GET", "POST"])]
