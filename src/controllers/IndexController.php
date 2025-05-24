@@ -4,9 +4,9 @@ namespace App\Controllers;
 
 use Framework\Attributes\Route;
 use Framework\Response;
-use Framework\Routing\IRouteController;
+use Framework\Routing\RouteBaseController;
 
-class IndexController extends IRouteController
+class IndexController extends RouteBaseController
 {
 
     #[Route('/')]

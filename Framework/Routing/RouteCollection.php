@@ -4,6 +4,10 @@ namespace Framework\Routing;
 
 class RouteCollection
 {
+    /**
+     * Summary of routes
+     * @var Route[]
+     */
     private array $routes = [];
 
     public function add(Route $route): void
