@@ -2,31 +2,44 @@
 
 declare(strict_types=1);
 
-use Framework\DependencyInjector\DependencyInjectorClass;
-use framework\Http\Request;
-use Framework\Http\Router;
-use Framework\Serializer\Deserializer;
-use Framework\Serializer\JSONConverter;
-use Framework\Serializer\Serializer;
-use src\Controllers\UserController;
+use App\Controllers\UserController;
+use Framework\Request;
+use Framework\Container;
+use Framework\HttpKernel;
+use Framework\Routing\Router;
+use Framework\Routing\RouteLoader;
+use Framework\Middleware\AuthMiddleware;
 
-use src\Models\User;
-use function src\Kernel\dd;
+require_once __DIR__ . '/../framework/autoload.php';
 
-require_once dirname(__DIR__) . '/framework/kernel/autolad.php';
+$request = new Request(
+    $_SERVER['REQUEST_METHOD'],
+    strtok($_SERVER['REQUEST_URI'], '?'),
+    $_GET,
+    $_POST,
+    getallheaders()
+);
 
-Router::manageRequest(Request::createFromGlobals());
+$router = new Router();
+if (!$router->loadCachedRoutes()) {
+    $loader = new RouteLoader();
+    $routes = $loader->loadFromControllerDirectory(__DIR__ . '/../src/Controllers');
 
+    /*
+    $routes = $loader->loadFromControllerAttributes([
+        UserController::class
+    ]);
+    */
+    $router->setRoutes($routes);
+    $router->cacheRoutes();
+}
 
-$u = new User();
-$u->setName('Juan');
-$u->setEmail('jmail@mail.test');
+$container = new Container();
+$kernel = new HttpKernel($router, $container);
 
+// Añadir middlewares
+$kernel->addMiddleware(new AuthMiddleware());
 
-$res = (new Serializer())->serialize($u, JSONConverter::getType());
-dd($res);
-
-
-//dd(json_decode($res));
-$res2 = (new Deserializer())->deserialize($res, JSONConverter::getType(), User::class);
-dd($res2);
+// Ejecutar
+$response = $kernel->handle($request);
+$response->send();
