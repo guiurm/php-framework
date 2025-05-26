@@ -2,27 +2,24 @@
 
 namespace Framework\Routing;
 
-class RouteCollection
+use Framework\Collections\AbsCollection;
+
+class RouteCollection extends AbsCollection
 {
     /**
      * Summary of routes
      * @var Route[]
      */
-    private array $routes = [];
+    protected array $data; // = [];
 
-    public function add(Route $route): void
+    public function __construct(array $routes = [])
     {
-        $this->routes[] = $route;
-    }
-
-    public function all(): array
-    {
-        return $this->routes;
+        $this->data = $routes;
     }
 
     public function getByName(string $name): ?Route
     {
-        foreach ($this->routes as $route) {
+        foreach ($this->data as $route) {
             if ($route->name === $name) {
                 return $route;
             }

@@ -2,44 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Controllers\UserController;
-use Framework\Request;
-use Framework\Container;
-use Framework\HttpKernel;
-use Framework\Routing\Router;
-use Framework\Routing\RouteLoader;
-use Framework\Middleware\AuthMiddleware;
+use Framework\Kernel\FrameworkKernel;
 
-require_once __DIR__ . '/../framework/autoload.php';
+require_once __DIR__ . '/../Framework/autoload.php';
 
-$request = new Request(
-    $_SERVER['REQUEST_METHOD'],
-    strtok($_SERVER['REQUEST_URI'], '?'),
-    $_GET,
-    $_POST,
-    getallheaders()
-);
+$kernel = new FrameworkKernel();
 
-$router = new Router();
-if (!$router->loadCachedRoutes()) {
-    $loader = new RouteLoader();
-    $routes = $loader->loadFromControllerDirectory(__DIR__ . '/../src/Controllers');
+$kernel->handle();
 
-    /*
-    $routes = $loader->loadFromControllerAttributes([
-        UserController::class
-    ]);
-    */
-    $router->setRoutes($routes);
-    $router->cacheRoutes();
-}
-
-$container = new Container();
-$kernel = new HttpKernel($router, $container);
-
-// Añadir middlewares
-$kernel->addMiddleware(new AuthMiddleware());
-
-// Ejecutar
-$response = $kernel->handle($request);
-$response->send();
+die();

@@ -4,10 +4,11 @@ namespace App\Controllers;
 
 use Framework\Attributes\Route;
 use Framework\Response;
+use Framework\Routing\RouteBaseController;
 
 
 #[Route(path: "/file")]
-class FileController
+class FileController extends RouteBaseController
 {
     public function __construct() {}
 

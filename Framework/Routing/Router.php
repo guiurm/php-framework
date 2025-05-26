@@ -23,7 +23,7 @@ class Router
     /**
      * Summary of match
      * @param \Framework\Request $request
-     * @return array{params: array, route: \Framework\Routing\Route|null}
+     * @return array{params: array, route: Route|null}
      */
     public function match(Request $request): ?array
     {

@@ -28,6 +28,12 @@ class RouteLoader
                 continue;
             }
 
+
+            $isRouteController = is_subclass_of($className, RouteBaseController::class) ? true : false;
+            if (!$isRouteController) {
+                continue;
+            }
+
             $refClass = new ReflectionClass($className);
 
             $this->addClassReflectionToCollection($refClass, $collection, $className);
@@ -36,7 +42,7 @@ class RouteLoader
         return $collection;
     }
 
-    public function loadFromControllerArray(array $controllers,): RouteCollection
+    public function loadFromControllerArray(array $controllers): RouteCollection
     {
         $collection = new RouteCollection();
 

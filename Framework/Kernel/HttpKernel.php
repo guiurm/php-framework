@@ -1,7 +1,9 @@
 <?php
 
-namespace Framework;
+namespace Framework\Kernel;
 
+use Framework\Container;
+use Framework\Events\EventDispatcher;
 use Framework\Exceptions\NotFoundException;
 use Framework\Request;
 use Framework\Response;
@@ -15,7 +17,8 @@ class HttpKernel
 
     public function __construct(
         private Router $router,
-        private Container $container
+        private Container $container,
+        public EventDispatcher $eventDispatcher = new EventDispatcher()
     ) {}
 
     public function addMiddleware(MiddlewareInterface $middleware): void
@@ -25,10 +28,11 @@ class HttpKernel
 
     public function handle(Request $request): Response
     {
+        $this->container->set(EventDispatcher::class, $this->eventDispatcher);
+
         try {
             return $this->applyMiddlewares($request, function (Request $request) {
-                $match = $this->router->match($request);
-                // if (!$match) return new Response("404 Not Found", 404);
+                $match = $this->router->match($request);;
                 if (!$match) {
                     throw new NotFoundException("Route not found for {$request->getMethod()} {$request->getUri()}", 404);
                 }
@@ -36,15 +40,13 @@ class HttpKernel
                 $route = $match['route'];
                 $params = $match['params'] ?? [];
                 $controller = $this->container->get($route->controllerClass);
-                if (is_subclass_of($controller, \Framework\Routing\RouteBaseController::class)) {
-                    // Usamos ReflectionMethod para acceder al método privado
-                    $reflection = new ReflectionMethod($controller, 'setRequest');
-                    $reflection->setAccessible(true);  // Hacemos que el método privado sea accesible
 
-                    // Llamamos al método privado
+                if (is_subclass_of($controller, \Framework\Routing\RouteBaseController::class)) {
+                    $reflection = new ReflectionMethod($controller, 'setRequest');
+                    $reflection->setAccessible(true);
+
                     $reflection->invoke($controller, request: $request);
                 }
-                pre(($controller));
 
                 $method = $route->controllerMethod ?? '__invoke';
 

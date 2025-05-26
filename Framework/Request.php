@@ -12,6 +12,17 @@ class Request
         public array $headers = [],
     ) {}
 
+    public static function createFromGlobals(): self
+    {
+        return new self(
+            method: $_SERVER['REQUEST_METHOD'],
+            uri: strtok($_SERVER['REQUEST_URI'], '?'),
+            query: $_GET,
+            body: $_POST,
+            headers: getallheaders()
+        );
+    }
+
     public function getHeader(string $name): ?string
     {
         return $this->headers[$name] ?? null;
