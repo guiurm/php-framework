@@ -2,8 +2,8 @@
 
 namespace Framework\Kernel;
 
-use Framework\Container;
-use Framework\Events\EventDispatcher;
+use Framework\ContainerSingleton;
+// use Framework\Events\EventDispatcher;
 use Framework\Exceptions\NotFoundException;
 use Framework\Request;
 use Framework\Response;
@@ -17,7 +17,7 @@ class HttpKernel
 
     public function __construct(
         private Router $router,
-        private Container $container,
+        // private Container $container,
         // public EventDispatcher $eventDispatcher = new EventDispatcher()
     ) {}
 
@@ -39,7 +39,9 @@ class HttpKernel
 
                 $route = $match['route'];
                 $params = $match['params'] ?? [];
-                $controller = $this->container->get($route->controllerClass);
+
+                // $controller = $this->container->get($route->controllerClass);
+                $controller = ContainerSingleton::getInstance()->get($route->controllerClass);
 
                 if (is_subclass_of($controller, \Framework\Routing\RouteBaseController::class)) {
                     $reflection = new ReflectionMethod($controller, 'setRequest');
@@ -65,7 +67,7 @@ class HttpKernel
                         }
                         $args[] = $this->cast($params[$name], $type);
                     } elseif (class_exists($type)) {
-                        $args[] = $this->container->get($type);
+                        $args[] = ContainerSingleton::getInstance()->get($type);
                     } elseif ($param->isDefaultValueAvailable()) {
                         $args[] = $param->getDefaultValue();
                     } else {

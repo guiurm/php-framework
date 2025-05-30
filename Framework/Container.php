@@ -6,7 +6,13 @@ use ReflectionClass;
 
 class Container
 {
-    private array $instances = [];
+    private array $instances; // = [];
+
+    public function __construct()
+    {
+
+        $this->instances = [];
+    }
 
     public function set(string $id, object $service): void
     {

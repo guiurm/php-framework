@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use Framework\Attributes\Route;
-use Framework\Events\EventDispatcher;
 use Framework\Response;
 use Framework\Routing\RouteBaseController;
 
@@ -11,7 +10,7 @@ class IndexController extends RouteBaseController
 {
 
     #[Route('/')]
-    public function index(EventDispatcher $eventDispatcher): Response
+    public function index(): Response
     {
 
         /* $eventDispatcher->addListener('kernel.request', function ($event) {

@@ -2,10 +2,10 @@
 
 namespace Framework\Kernel;
 
-use Framework\Container;
+use Framework\ContainerSingleton;
 use Framework\Discover\FrameworkDiscover;
 use Framework\Events\Event;
-use Framework\Events\EventDispatcher;
+// use Framework\Events\EventDispatcher;
 use Framework\Middleware\AuthMiddleware;
 use Framework\Request;
 use Framework\Routing\RouteBaseController;
@@ -18,7 +18,7 @@ class FrameworkKernel
 {
     private static FrameworkKernel $instance;
     private Router $router;
-    private Container $container;
+    // private Container $container;
     private HttpKernel $httpKernel;
     // private EventDispatcher $eventDispatcher;
 
@@ -31,11 +31,11 @@ class FrameworkKernel
         } else {
 
             $this->router = new Router();
-            $this->container = new Container();
+            // $this->container = new Container();
             // $this->eventDispatcher = new EventDispatcher();
             $this->httpKernel = new HttpKernel(
                 router: $this->router,
-                container: $this->container,
+                // container: $this->container,
                 // eventDispatcher: $this->eventDispatcher
             );
             self::$instance = $this;
@@ -60,9 +60,9 @@ class FrameworkKernel
         return $this->router;
     }
 
-    public function getContainer(): Container
+    public function getContainer(): ContainerSingleton
     {
-        return $this->container;
+        return ContainerSingleton::getInstance();
     }
 
 
