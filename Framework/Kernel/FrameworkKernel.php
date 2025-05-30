@@ -20,7 +20,7 @@ class FrameworkKernel
     private Router $router;
     private Container $container;
     private HttpKernel $httpKernel;
-    private EventDispatcher $eventDispatcher;
+    // private EventDispatcher $eventDispatcher;
 
     public static string $APP_PATH = __DIR__ . '/../../src';
 
@@ -32,11 +32,11 @@ class FrameworkKernel
 
             $this->router = new Router();
             $this->container = new Container();
-            $this->eventDispatcher = new EventDispatcher();
+            // $this->eventDispatcher = new EventDispatcher();
             $this->httpKernel = new HttpKernel(
                 router: $this->router,
                 container: $this->container,
-                eventDispatcher: $this->eventDispatcher
+                // eventDispatcher: $this->eventDispatcher
             );
             self::$instance = $this;
         }
@@ -76,12 +76,12 @@ class FrameworkKernel
             RouteBaseController::class => function (ReflectionClass $refClass) use (&$routeControllers) {
                 $routeControllers[] = $refClass->getName();
             },
-            Event::class => function (ReflectionClass $refClass) use (&$eventModels) {
-                $eventModels[] = $refClass->getName();
-            },
-            EventDispatcher::class => function (ReflectionClass $refClass) use (&$eventDistpachers) {
-                $eventDistpachers[] = $refClass->getName();
-            },
+            // Event::class => function (ReflectionClass $refClass) use (&$eventModels) {
+            //     $eventModels[] = $refClass->getName();
+            // },
+            // EventDispatcher::class => function (ReflectionClass $refClass) use (&$eventDistpachers) {
+            //     $eventDistpachers[] = $refClass->getName();
+            // },
         ]);
 
         $frameWorkDiscover->discover();

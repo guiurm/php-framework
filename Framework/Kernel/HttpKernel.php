@@ -18,7 +18,7 @@ class HttpKernel
     public function __construct(
         private Router $router,
         private Container $container,
-        public EventDispatcher $eventDispatcher = new EventDispatcher()
+        // public EventDispatcher $eventDispatcher = new EventDispatcher()
     ) {}
 
     public function addMiddleware(MiddlewareInterface $middleware): void
@@ -28,7 +28,7 @@ class HttpKernel
 
     public function handle(Request $request): Response
     {
-        $this->container->set(EventDispatcher::class, $this->eventDispatcher);
+        // $this->container->set(EventDispatcher::class, $this->eventDispatcher);
 
         try {
             return $this->applyMiddlewares($request, function (Request $request) {
