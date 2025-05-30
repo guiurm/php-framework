@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework;
+namespace Framework\Kernel\Container;
 
 class ContainerSingleton extends Container
 {

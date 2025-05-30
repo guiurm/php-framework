@@ -1,9 +1,9 @@
 <?php
 
-namespace Framework\Kernel;
+namespace Framework\Kernel\HttpKernel;
 
-use Framework\ContainerSingleton;
 // use Framework\Events\EventDispatcher;
+use Framework\Kernel\Container\ContainerSingleton;
 use Framework\Exceptions\NotFoundException;
 use Framework\Request;
 use Framework\Response;

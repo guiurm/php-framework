@@ -1,15 +1,13 @@
 <?php
 
-namespace Framework\Kernel;
+namespace Framework\Kernel\App;
 
-use Framework\ContainerSingleton;
+use Framework\Kernel\Container\ContainerSingleton;
 use Framework\Discover\FrameworkDiscover;
-use Framework\Events\Event;
-// use Framework\Events\EventDispatcher;
+use Framework\Kernel\HttpKernel\HttpKernel;
 use Framework\Middleware\AuthMiddleware;
 use Framework\Request;
 use Framework\Routing\RouteBaseController;
-use Framework\Routing\RouteCollection;
 use Framework\Routing\RouteLoader;
 use Framework\Routing\Router;
 use ReflectionClass;
@@ -22,7 +20,7 @@ class FrameworkKernel
     private HttpKernel $httpKernel;
     // private EventDispatcher $eventDispatcher;
 
-    public static string $APP_PATH = __DIR__ . '/../../src';
+    public static string $APP_PATH = __DIR__ . '/../../../src';
 
     public function __construct()
     {

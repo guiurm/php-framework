@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Framework\Kernel\FrameworkKernel;
+use Framework\Kernel\App\FrameworkKernel;
 
 require_once __DIR__ . '/../Framework/autoload.php';
 
