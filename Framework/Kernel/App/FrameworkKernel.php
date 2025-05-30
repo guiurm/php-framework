@@ -2,6 +2,7 @@
 
 namespace Framework\Kernel\App;
 
+use Framework\EventHandling\EventDispatcher;
 use Framework\Kernel\Container\ContainerSingleton;
 use Framework\Discover\FrameworkDiscover;
 use Framework\Kernel\HttpKernel\HttpKernel;
@@ -19,6 +20,7 @@ class FrameworkKernel
     // private Container $container;
     private HttpKernel $httpKernel;
     // private EventDispatcher $eventDispatcher;
+    private EventDispatcher $eventDistpacher;
 
     public static string $APP_PATH = __DIR__ . '/../../../src';
 
@@ -30,12 +32,15 @@ class FrameworkKernel
 
             $this->router = new Router();
             // $this->container = new Container();
-            // $this->eventDispatcher = new EventDispatcher();
+            $this->eventDistpacher = new EventDispatcher();
             $this->httpKernel = new HttpKernel(
                 router: $this->router,
                 // container: $this->container,
                 // eventDispatcher: $this->eventDispatcher
             );
+
+            ContainerSingleton::getInstance()->set(EventDispatcher::class, $this->eventDistpacher);
+
             self::$instance = $this;
         }
     }
